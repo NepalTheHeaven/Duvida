@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Traffic Intelligence",
+    "slug": "traffic-intelligence-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0A0714",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0714"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.traffic.intelligence"
+    },
+    "android": {
+      "package": "com.traffic.intelligence",
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0714"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_ANDROID_MAPS_API_KEY"
+        }
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow access to attach accident photos."
+        }
+      ]
+    ]
+  }
+}
