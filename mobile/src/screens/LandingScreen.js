@@ -8,7 +8,7 @@ import { colors, spacing } from '../theme';
 export default function LandingScreen({ navigation }) {
   return (
     <Screen>
-      <LinearGradient colors={[colors.bgGradientTop, colors.bg]} style={styles.fill}>
+      <LinearGradient colors={['#1E1035', colors.bg]} style={styles.fill}>
         <View style={styles.content}>
           {/* Brand mark */}
           <View style={styles.logoWrap}>
