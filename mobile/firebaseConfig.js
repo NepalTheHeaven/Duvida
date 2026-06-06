@@ -14,12 +14,12 @@ import {
 } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_PROJECT.firebaseapp.com',
-  projectId: 'YOUR_PROJECT',
-  storageBucket: 'YOUR_PROJECT.appspot.com',
-  messagingSenderId: 'YOUR_SENDER_ID',
-  appId: 'YOUR_APP_ID',
+  apiKey: 'AIzaSyAzMAtQ09pR2z2ztIyAc7wgXukrX8APhnY',
+  authDomain: 'dubida.firebaseapp.com',
+  projectId: 'dubida',
+  storageBucket: 'dubida.firebasestorage.app',
+  messagingSenderId: '334306087453',
+  appId: '1:334306087453:web:f49342b087c31b85282cf4',
 };
 
 const app = initializeApp(firebaseConfig);

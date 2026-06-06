@@ -11,32 +11,70 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Screen, PrimaryButton, SecondaryButton } from '../components';
+import { Screen, PrimaryButton, SecondaryButton, Segmented, Field } from '../components';
 import { colors, spacing, radius } from '../theme';
 import { login, register } from '../services/accidentService';
+
+const ROLE_OPTIONS = [
+  { label: 'Officer', value: 'officer' },
+  { label: 'Supervisor', value: 'supervisor' },
+];
 
 export default function LoginScreen() {
   const [mode, setMode] = useState('login'); // 'login' | 'register'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('officer');
   const [busy, setBusy] = useState(false);
 
-  const submit = async () => {
-    if (!email || !password) {
-      Alert.alert('Missing details', 'Please enter your email and password.');
-      return;
+  const validate = () => {
+    if (mode === 'register' && !name.trim()) {
+      Alert.alert('Missing details', 'Please enter your full name.');
+      return false;
     }
+    if (!email.trim()) {
+      Alert.alert('Missing details', 'Please enter your email address.');
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      Alert.alert('Invalid email', 'Please enter a valid email address.');
+      return false;
+    }
+    if (!password) {
+      Alert.alert('Missing details', 'Please enter your password.');
+      return false;
+    }
+    if (mode === 'register' && password.length < 6) {
+      Alert.alert('Weak password', 'Password must be at least 6 characters.');
+      return false;
+    }
+    return true;
+  };
+
+  const submit = async () => {
+    if (!validate()) return;
     try {
       setBusy(true);
-      if (mode === 'login') await login(email, password);
-      else await register(name, email, password);
+      if (mode === 'login') {
+        await login(email, password);
+      } else {
+        await register(name, email, password, role);
+      }
       // Navigation happens automatically via the auth state listener in App.js
     } catch (e) {
       Alert.alert('Authentication failed', e.message);
     } finally {
       setBusy(false);
     }
+  };
+
+  const switchMode = () => {
+    setMode(mode === 'login' ? 'register' : 'login');
+    setName('');
+    setEmail('');
+    setPassword('');
+    setRole('officer');
   };
 
   return (
@@ -59,14 +97,20 @@ export default function LoginScreen() {
 
           <View style={styles.form}>
             {mode === 'register' && (
-              <TextInput
-                placeholder="Full name"
-                placeholderTextColor={colors.textMuted}
-                value={name}
-                onChangeText={setName}
-                style={styles.input}
-              />
+              <>
+                <TextInput
+                  placeholder="Full name"
+                  placeholderTextColor={colors.textMuted}
+                  value={name}
+                  onChangeText={setName}
+                  style={styles.input}
+                />
+                <Field label="Role">
+                  <Segmented options={ROLE_OPTIONS} value={role} onChange={setRole} />
+                </Field>
+              </>
             )}
+
             <TextInput
               placeholder="Email"
               placeholderTextColor={colors.textMuted}
@@ -93,7 +137,7 @@ export default function LoginScreen() {
             />
             <SecondaryButton
               title={mode === 'login' ? 'Create Account' : 'Back to Login'}
-              onPress={() => setMode(mode === 'login' ? 'register' : 'login')}
+              onPress={switchMode}
               style={{ marginTop: spacing.md }}
             />
           </View>

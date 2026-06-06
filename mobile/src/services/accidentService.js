@@ -9,6 +9,9 @@ import {
   collection,
   addDoc,
   getDocs,
+  getDoc,
+  doc,
+  setDoc,
   query,
   orderBy,
   limit,
@@ -19,18 +22,48 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '../../firebaseConfig';
 
 const ACCIDENTS = 'accidents';
+const USERS = 'users';
 
 /* ---------------- Auth ---------------- */
-export const login = (email, password) =>
-  signInWithEmailAndPassword(auth, email.trim(), password);
 
-export const register = async (name, email, password) => {
-  const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
-  if (name) await updateProfile(cred.user, { displayName: name });
+const AUTH_ERRORS = {
+  'auth/invalid-email': 'Please enter a valid email address.',
+  'auth/user-disabled': 'This account has been disabled. Contact your administrator.',
+  'auth/user-not-found': 'No account found with this email.',
+  'auth/wrong-password': 'Incorrect password. Please try again.',
+  'auth/invalid-credential': 'Incorrect email or password.',
+  'auth/email-already-in-use': 'An account with this email already exists.',
+  'auth/weak-password': 'Password must be at least 6 characters.',
+  'auth/network-request-failed': 'Network error. Check your connection and try again.',
+  'auth/too-many-requests': 'Too many failed attempts. Try again later.',
+};
+
+const mapAuthError = (err) => {
+  const message = AUTH_ERRORS[err.code];
+  throw message ? new Error(message) : err;
+};
+
+export const login = (email, password) =>
+  signInWithEmailAndPassword(auth, email.trim(), password).catch(mapAuthError);
+
+export const register = async (name, email, password, role = 'officer') => {
+  const cred = await createUserWithEmailAndPassword(auth, email.trim(), password).catch(mapAuthError);
+  if (name) await updateProfile(cred.user, { displayName: name.trim() });
+  await setDoc(doc(db, USERS, cred.user.uid), {
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    role,
+    createdAt: serverTimestamp(),
+  });
   return cred;
 };
 
 export const logout = () => signOut(auth);
+
+export const getUserProfile = async (uid) => {
+  const snap = await getDoc(doc(db, USERS, uid));
+  return snap.exists() ? snap.data() : null;
+};
 
 /* ---------------- Photos ---------------- */
 // uri -> Firebase Storage download URL

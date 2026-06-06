@@ -40,8 +40,11 @@ const CenterButton = ({ onPress }) => (
 );
 
 function MainTabs() {
+  const { role } = useAuth();
+  const initialTab = role === 'supervisor' ? 'Dashboard' : 'Home';
   return (
     <Tab.Navigator
+      initialRouteName={initialTab}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: styles.tabBar,
